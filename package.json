@@ -1,5 +1,5 @@
 {
-  "name": "moneypay-side-panel-plugin",
+  "name": "moneypay-side-plugin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

@@ -5,7 +5,7 @@ import {
   MoneyPayTransaction,
 } from "@/types/moneypay.type";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://moneypay.grispi.app";
 
 /**
  * Converts a date from YYYY-MM-DD format to DD.MM.YYYY format
@@ -44,7 +44,7 @@ export async function getPaymentDetails(
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/moneypay/payment-details`, {
+    const response = await fetch(`${API_BASE_URL}/payment-details`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
