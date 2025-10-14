@@ -1,9 +1,20 @@
 import { RocketIcon } from "@radix-ui/react-icons";
 import { observer } from "mobx-react-lite";
+import { useMemo } from "react";
 
 import { Screen, ScreenContent } from "@/components/ui/screen";
 
+const inspirationalMessages = [
+  "Güvenilir hizmet, sadık müşteriler kazandırır...",
+  "Başarı, tutarlılığın sonucudur...",
+  "İnovasyon, geleceğin anahtarıdır...",
+];
+
 export const LoadingScreen = observer(() => {
+  const randomMessage = useMemo(() => {
+    return inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
+  }, []);
+
   return (
     <Screen className="flex flex-col h-full bg-background">
       <ScreenContent className="flex overflow-y-auto flex-1 justify-center items-center p-4">
@@ -16,9 +27,9 @@ export const LoadingScreen = observer(() => {
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-semibold text-foreground">
-              Loading...
+              Yükleniyor...
             </h2>
-            <p className="text-sm text-muted-foreground">Please wait...</p>
+            <p className="text-sm text-muted-foreground">{randomMessage}</p>
           </div>
           <div className="overflow-hidden w-16">
             <div className="overflow-hidden rounded-full bg-primary/20">

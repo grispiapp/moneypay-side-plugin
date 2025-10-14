@@ -48,12 +48,12 @@ export const HomeScreen = observer(() => {
     const fetchTransactions = useCallback(async (filters: GetPaymentDetailsRequest) => {
         if (!bundle?.context.token) return
 
-        // Önceki isteği iptal et
+        // Cancel previous request
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
 
-        // Yeni AbortController oluştur
+        // Create new AbortController
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
 
@@ -63,7 +63,7 @@ export const HomeScreen = observer(() => {
         try {
             const response = await getPaymentDetails(filters, abortController.signal);
 
-            // İstek iptal edildiyse, state'i güncelleme
+            // If request was cancelled, don't update state
             if (abortController.signal.aborted) {
                 return;
             }
@@ -76,7 +76,7 @@ export const HomeScreen = observer(() => {
                 setTransactions(response.data);
             }
         } catch (err) {
-            // İstek iptal edildiyse, hatayı gösterme
+            // If request was cancelled, don't show error
             if (err instanceof Error && err.name === 'AbortError') {
                 return;
             }
@@ -84,25 +84,27 @@ export const HomeScreen = observer(() => {
             setError("Bir hata oluştu. Lütfen tekrar deneyin.");
             setTransactions([]);
         } finally {
-            // İstek iptal edildiyse, loading state'ini güncelleme
+            // If request was cancelled, don't update loading state
             if (!abortController.signal.aborted) {
                 setIsLoadingTransactions(false);
             }
         }
     }, [bundle?.context.token]);
 
-    // Fetch transactions on mount and when filters change
+    // Fetch transactions only on first mount with default filters
     useEffect(() => {
+        if (!bundle?.context.token) return
+
         fetchTransactions(filters);
 
-        // Cleanup: component unmount olduğunda veya filters değiştiğinde önceki isteği iptal et
+        // Cleanup: Cancel previous request when component unmounts
         return () => {
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
             }
         };
         /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, []);
+    }, [bundle?.context.token]);
 
     if (loading) {
         return <LoadingScreen />;
@@ -111,7 +113,7 @@ export const HomeScreen = observer(() => {
     return (
         <Screen>
             <ScreenHeader>
-                <ScreenTitle>MoneyPay Mutabakat Ekranı</ScreenTitle>
+                <ScreenTitle>MoneyPay Reconciliation Screen</ScreenTitle>
             </ScreenHeader>
             <ScreenContent>
                 <div className="flex flex-col">
