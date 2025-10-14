@@ -1,6 +1,7 @@
 {
   "name": "moneypay-side-plugin",
   "version": "0.1.0",
+  "homepage": "/moneypay-side-plugin/build",
   "private": true,
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.0",
