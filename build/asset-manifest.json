@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/moneypay-side-plugin/build/static/css/main.7dafcfc7.css",
-    "main.js": "/moneypay-side-plugin/build/static/js/main.a0e8b92e.js",
+    "main.js": "/moneypay-side-plugin/build/static/js/main.3e310355.js",
     "index.html": "/moneypay-side-plugin/build/index.html",
     "main.7dafcfc7.css.map": "/moneypay-side-plugin/build/static/css/main.7dafcfc7.css.map",
-    "main.a0e8b92e.js.map": "/moneypay-side-plugin/build/static/js/main.a0e8b92e.js.map"
+    "main.3e310355.js.map": "/moneypay-side-plugin/build/static/js/main.3e310355.js.map"
   },
   "entrypoints": [
     "static/css/main.7dafcfc7.css",
-    "static/js/main.a0e8b92e.js"
+    "static/js/main.3e310355.js"
   ]
 }
