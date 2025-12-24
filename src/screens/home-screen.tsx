@@ -1,8 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import { useState, useCallback, useRef } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
     Screen,
     ScreenContent,
@@ -13,14 +11,13 @@ import { useGrispi } from "@/contexts/grispi-context";
 import { LoadingScreen } from "./loading-screen";
 import { Filters } from "@/components/filters";
 import { TransactionList } from "@/components/transaction-list";
-import { TestModeBanner } from "@/components/test-mode-banner";
 import { GetPaymentDetailsRequest, MoneyPayTransaction } from "@/types/moneypay.type";
 import { getPaymentDetails } from "@/api/moneypay.api";
 import { isApiError } from "@/types/api.type";
+import { LoadingWrapper } from "@/components/loading-wrapper";
 
 export const HomeScreen = observer(() => {
     const { bundle, loading } = useGrispi();
-    const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
     const [transactions, setTransactions] = useState<MoneyPayTransaction[]>([]);
     const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -28,13 +25,11 @@ export const HomeScreen = observer(() => {
 
     // Initialize with last 90 days
     const getDefaultFilters = (): GetPaymentDetailsRequest => {
-        const today = new Date();
-        const ninetyDaysAgo = new Date();
-        ninetyDaysAgo.setDate(today.getDate() - 90);
+        const today = new Date().toISOString().split("T")[0];
 
         return {
-            startDate: ninetyDaysAgo.toISOString().split("T")[0],
-            endDate: today.toISOString().split("T")[0],
+            startDate: today,
+            endDate: today,
             transactionType: "0",
             storeNumber: "",
             laneNumber: "",
@@ -45,7 +40,7 @@ export const HomeScreen = observer(() => {
     const [filters, setFilters] = useState<GetPaymentDetailsRequest>(getDefaultFilters());
 
     // Fetch transactions when filters change
-    const fetchTransactions = useCallback(async (filters: GetPaymentDetailsRequest) => {
+    const fetchTransactions = useCallback(async () => {
         if (!bundle?.context.token) return
 
         // Cancel previous request
@@ -60,8 +55,20 @@ export const HomeScreen = observer(() => {
         setIsLoadingTransactions(true);
         setError(null);
 
+        if (!filters.storeNumber || !filters.transactionNumber) {
+            setError("Mağaza kodu ve işlem numarası gereklidir.");
+            setTransactions([]);
+            setIsLoadingTransactions(false);
+            return;
+        }
+
+        const payload: GetPaymentDetailsRequest = {
+            ...filters,
+            transactionNumber: filters.transactionNumber ? `${filters.storeNumber}m${filters.transactionNumber}` : undefined
+        }
+
         try {
-            const response = await getPaymentDetails(filters, abortController.signal);
+            const response = await getPaymentDetails(payload, abortController.signal);
 
             // If request was cancelled, don't update state
             if (abortController.signal.aborted) {
@@ -69,10 +76,13 @@ export const HomeScreen = observer(() => {
             }
 
             if (isApiError(response)) {
-                setError(response.data.error.description);
+                const errorMessage = typeof response.data.error === 'string'
+                    ? response.data.error
+                    : response.data.error.description;
+
+                setError(errorMessage);
                 setTransactions([]);
             } else {
-                console.log({ response })
                 setTransactions(response.data);
             }
         } catch (err) {
@@ -89,22 +99,7 @@ export const HomeScreen = observer(() => {
                 setIsLoadingTransactions(false);
             }
         }
-    }, [bundle?.context.token]);
-
-    // Fetch transactions only on first mount with default filters
-    useEffect(() => {
-        if (!bundle?.context.token) return
-
-        fetchTransactions(filters);
-
-        // Cleanup: Cancel previous request when component unmounts
-        return () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-            }
-        };
-        /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    }, [bundle?.context.token]);
+    }, [bundle?.context.token, filters]);
 
     if (loading) {
         return <LoadingScreen />;
@@ -113,51 +108,23 @@ export const HomeScreen = observer(() => {
     return (
         <Screen>
             <ScreenHeader>
-                <ScreenTitle>MoneyPay Reconciliation Screen</ScreenTitle>
+                <ScreenTitle>MoneyPay Mutabakat Ekranı</ScreenTitle>
             </ScreenHeader>
             <ScreenContent>
                 <div className="flex flex-col">
-                    {/* Test Mode Banner */}
-                    <TestModeBanner />
-
                     {/* Filters Section */}
-                    <div className="bg-white shadow-sm">
-                        <div className="p-4 border-b border-gray-100">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-medium text-gray-800 text-md">
-                                    Filtreler
-                                </h3>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
-                                    className="w-8 h-8"
-                                >
-                                    {isFiltersExpanded ? (
-                                        <ChevronUpIcon className="w-4 h-4" />
-                                    ) : (
-                                        <ChevronDownIcon className="w-4 h-4" />
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="p-4">
-                            <Filters
-                                filters={filters}
-                                onFiltersChange={setFilters}
-                                showOnlyDateRange={!isFiltersExpanded}
-                                onSubmit={() => fetchTransactions(filters)}
-                            />
-                        </div>
+                    <div className="p-3 space-y-2 bg-white shadow-sm">
+                        <Filters
+                            loading={isLoadingTransactions}
+                            filters={filters}
+                            onFiltersChange={setFilters}
+                            onSubmit={fetchTransactions}
+                        />
                     </div>
 
                     <div className="my-3">
                         {/* Loading State */}
-                        {isLoadingTransactions && (
-                            <div className="flex justify-center items-center py-8">
-                                <div className="text-sm text-gray-500">Yükleniyor...</div>
-                            </div>
-                        )}
+                        {isLoadingTransactions && <LoadingWrapper />}
 
                         {/* Error State */}
                         {error && !isLoadingTransactions && (

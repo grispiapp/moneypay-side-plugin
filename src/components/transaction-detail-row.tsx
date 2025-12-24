@@ -1,19 +1,15 @@
-import { FC, ReactNode } from "react";
+import type { FC, ReactNode } from "react"
 
 interface TransactionDetailRowProps {
-    label: string;
-    value: ReactNode;
+    label: string
+    value: ReactNode
 }
 
-export const TransactionDetailRow: FC<TransactionDetailRowProps> = ({
-    label,
-    value,
-}) => {
+export const TransactionDetailRow: FC<TransactionDetailRowProps> = ({ label, value }) => {
     return (
-        <div className="flex justify-between items-center py-1">
-            <span className="text-sm text-gray-500">{label}:</span>
-            <div className="text-sm font-medium">{value}</div>
+        <div className="flex justify-between items-start gap-2 py-0.5">
+            <span className="text-xs text-gray-500 shrink-0">{label}:</span>
+            <div className="min-w-0 text-xs font-medium text-right break-words">{value}</div>
         </div>
-    );
-};
-
+    )
+}
