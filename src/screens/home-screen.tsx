@@ -33,7 +33,7 @@ export const HomeScreen = observer(() => {
             transactionType: "0",
             storeNumber: "",
             laneNumber: "",
-            transactionNumber: "",
+            migrosTransactionId: "",
         };
     };
 
@@ -55,7 +55,7 @@ export const HomeScreen = observer(() => {
         setIsLoadingTransactions(true);
         setError(null);
 
-        if (!filters.storeNumber || !filters.transactionNumber) {
+        if (!filters.storeNumber || !filters.migrosTransactionId) {
             setError("Mağaza kodu ve işlem numarası gereklidir.");
             setTransactions([]);
             setIsLoadingTransactions(false);
@@ -64,7 +64,7 @@ export const HomeScreen = observer(() => {
 
         const payload: GetPaymentDetailsRequest = {
             ...filters,
-            transactionNumber: filters.transactionNumber ? `${filters.storeNumber}m${filters.transactionNumber}` : undefined
+            migrosTransactionId: filters.migrosTransactionId ? `${filters.storeNumber}m${filters.migrosTransactionId}` : undefined
         }
 
         try {

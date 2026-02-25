@@ -47,9 +47,9 @@ export const Filters: FC<FiltersProps> = ({
 					<Input
 						type="text"
 						placeholder="İşlem numarası giriniz"
-						value={filters.transactionNumber}
+						value={filters.migrosTransactionId}
 						onChange={(e) =>
-							handleInputChange("transactionNumber", e.target.value)
+							handleInputChange("migrosTransactionId", e.target.value)
 						}
 						className="w-full"
 						disabled={loading}

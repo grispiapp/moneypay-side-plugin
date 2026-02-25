@@ -8,7 +8,6 @@ export interface GetPaymentDetailsRequest {
   endDate: string;
   storeNumber?: string;
   laneNumber?: string;
-  transactionNumber?: string;
   transactionType?: "0" | "1" | "2" | "";
   migrosTransactionId?: string;
   moneypayTransactionId?: string;
