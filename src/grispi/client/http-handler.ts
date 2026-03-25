@@ -1,5 +1,5 @@
 export class HttpHandler {
-  baseUrl: string = "https://api.grispi.com";
+  baseUrl: string = "https://api.grispi.com.tr";
   headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
